@@ -30,7 +30,9 @@ from tradingagents.agents.utils.agent_utils import (
     get_income_statement,
     get_news,
     get_insider_transactions,
-    get_global_news
+    get_global_news,
+    get_arxiv_papers,
+    get_arxiv_finance_papers,
 )
 
 from .conditional_logic import ConditionalLogic
@@ -189,6 +191,13 @@ class TradingAgentsGraph:
                     get_income_statement,
                 ]
             ),
+            "arxiv": ToolNode(
+                [
+                    # arXiv academic research tools
+                    get_arxiv_papers,
+                    get_arxiv_finance_papers,
+                ]
+            ),
         }
 
     def propagate(self, company_name, trade_date):
@@ -235,6 +244,7 @@ class TradingAgentsGraph:
             "sentiment_report": final_state["sentiment_report"],
             "news_report": final_state["news_report"],
             "fundamentals_report": final_state["fundamentals_report"],
+            "arxiv_report": final_state.get("arxiv_report", ""),
             "investment_debate_state": {
                 "bull_history": final_state["investment_debate_state"]["bull_history"],
                 "bear_history": final_state["investment_debate_state"]["bear_history"],
