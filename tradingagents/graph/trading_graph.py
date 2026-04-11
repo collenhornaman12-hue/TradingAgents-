@@ -80,16 +80,26 @@ class TradingAgentsGraph:
         if self.callbacks:
             llm_kwargs["callbacks"] = self.callbacks
 
+        # Only pass backend_url for OpenAI-compatible providers.
+        # Anthropic and Google use their own hardcoded endpoints; passing an
+        # OpenAI URL to them causes a 404.
+        _openai_compatible = {"openai", "ollama", "openrouter", "xai"}
+        base_url = (
+            self.config.get("backend_url")
+            if self.config["llm_provider"].lower() in _openai_compatible
+            else None
+        )
+
         deep_client = create_llm_client(
             provider=self.config["llm_provider"],
             model=self.config["deep_think_llm"],
-            base_url=self.config.get("backend_url"),
+            base_url=base_url,
             **llm_kwargs,
         )
         quick_client = create_llm_client(
             provider=self.config["llm_provider"],
             model=self.config["quick_think_llm"],
-            base_url=self.config.get("backend_url"),
+            base_url=base_url,
             **llm_kwargs,
         )
 
